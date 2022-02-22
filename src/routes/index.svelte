@@ -1,2 +1,14 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import Search from "../search.svelte";
+    import { DISCLAIMER } from "../db/copy";
+</script>
+
+<main>
+    <h1 id="action-header">
+        <span id="eponym">Dog ate</span>
+        <Search></Search>
+    </h1> 
+    <footer id="disclaimer">
+        {@html DISCLAIMER}
+    </footer>
+</main>
