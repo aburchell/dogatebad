@@ -1,21 +1,12 @@
 <script lang="ts">
     import Fuse from 'fuse.js';
-    import { records as foods } from "./db/foods";
-    import type { FoodSummary, FoodRecord } from "./db/dabTypes";
-    export let placeholder="...";
+    import { onMount } from 'svelte';
+    import { getAllSummaries, getFood, getSearchTerms } from './fn';
+    import {focusedFood } from "./state"
+    export let currentQuery="...";
 
-    const searchTerms = [];
-    const foodSummaries = foods.map(f => {return {name: f.name, verdict: f.verdict, aka: f.aka} as FoodSummary});
-    foodSummaries.forEach(food => {
-        const terms = [food.name, ...food.aka];
-        terms.forEach(term => searchTerms.push({name: term, summary: food}))});
+    let searchTerms, foodSummaries, fuse;
 
-    const fuseOptions = {
-        findAllMatches: true,
-        keys: ["name"]
-    };
-    const fuse = new Fuse(searchTerms, fuseOptions);
-    console.log("searchTerms", searchTerms);
     const getSearchSuggestions = (e: any):any[] => {
         const query = e.target.value;
         const results =  fuse.search(query).map(result => result.item.summary);
@@ -30,14 +21,32 @@
         });
         return results;
     }
+
+    const changeFocusFood = (e: any):void => {
+        const query = e.target.value;
+        focusedFood.set(getFood(query))
+    }
+
+    onMount(() => {
+        searchTerms = getSearchTerms();
+        foodSummaries = getAllSummaries();
+        const fuseOptions = {
+            findAllMatches: true,
+            keys: ["name"]
+        };
+         fuse = new Fuse(searchTerms, fuseOptions);
+
+
+    })
 </script>
 
 <datalist id="search-suggestions"></datalist>
 <input 
     type="text" 
     id="searchbar" 
-    placeholder={placeholder} 
+    placeholder={currentQuery} 
     on:input={getSearchSuggestions}
+    on:change={changeFocusFood}
     list="search-suggestions"
     autocomplete="off"
 >
